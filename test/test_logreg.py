@@ -77,13 +77,45 @@ def test_loss_function():
 	assert np.isclose(sklearn_loss, log_model_loss, atol=0.5), \
 	"loss of the implemented model is not sufficiently close to the sklearn model"
 
-
 def test_gradient():
-	pass
+	# Load data
+	X_train, X_val, y_train, y_val = _load_data()
+	# Scale the data, since values vary across feature. Note that we
+	# fit on the training data and use the same scaler for X_val.
+	sc = StandardScaler()
+	X_train = sc.fit_transform(X_train)
+	X_val = sc.transform(X_val)
+
+	# Create a logistic regression model from scratch
+	log_model = logreg.LogisticRegressor(num_feats=X_train.shape[1], max_iter=1000, learning_rate=0.1, batch_size=1000)
+	log_model.train_model(X_train, y_train, X_val, y_val)
+	log_model_pred = log_model.make_prediction(X_val)
+	# convert the predicted values to 0 or 1
+	log_model_pred = np.where(log_model_pred > 0.5, 1, 0)
+	log_model_grad = log_model.calculate_gradient(y_val, X_val)
+
+	# Check that the gradient is calculated correctly
+	assert np.allclose(log_model_grad, 0, atol=0.1), "gradient is not calculated correctly"
+	# more info https://medium.com/@IwriteDSblog/gradient-descent-for-logistics-regression-in-python-18e033775082
 
 
 def test_training():
-	pass
+	# Load data
+	X_train, X_val, y_train, y_val = _load_data()
+	# Scale the data, since values vary across feature. Note that we
+	# fit on the training data and use the same scaler for X_val.
+	sc = StandardScaler()
+	X_train = sc.fit_transform(X_train)
+	X_val = sc.transform(X_val)
+
+	# Create a logistic regression model from scratch
+	log_model = logreg.LogisticRegressor(num_feats=X_train.shape[1], max_iter=1000, learning_rate=0.1, batch_size=1000)
+	initW = log_model.W
+	log_model.train_model(X_train, y_train, X_val, y_val)
+	finalW = log_model.W
+	
+	# Check that the weights are updated during training
+	assert not np.allclose(initW, finalW), "weights are not updated during training"
 
 
 def _load_data():
