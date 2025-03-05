@@ -129,7 +129,17 @@ class LogisticRegressor(BaseRegressor):
         Returns: 
             The predicted labels (y_pred) for given X.
         """
-        pass
+        # Add bias term if not already present
+        if X.shape[1] != self.num_feats + 1 or X.shape[1] == self.num_feats:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
+        
+        # Calculate linear model
+        linear_model = np.dot(X, self.W)
+        
+        # Apply logistic function – this is the sigmoid function
+        y_pred = 1 / (1 + np.exp(-linear_model))
+        
+        return y_pred
     
     def loss_function(self, y_true, y_pred) -> float:
         """
@@ -143,8 +153,13 @@ class LogisticRegressor(BaseRegressor):
         Returns: 
             The mean loss (a single number).
         """
-        pass
-        
+        # clip the predicted values to avoid log(0)
+        epsilon = 1e-15
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        # calculate the mean loss
+        loss = -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+        return loss
+
     def calculate_gradient(self, y_true, X) -> np.ndarray:
         """
         TODO: Calculate the gradient of the loss function with respect to the given data. This
@@ -157,4 +172,14 @@ class LogisticRegressor(BaseRegressor):
         Returns: 
             Vector of gradients.
         """
-        pass
+        # Add bias term if not already present
+        if X.shape[1] != self.num_feats + 1 or X.shape[1] == self.num_feats:
+            X = np.hstack([X, np.ones((X.shape[0], 1))])
+        
+        # Calculate the predicted values
+        y_pred = self.make_prediction(X)
+        
+        # Calculate the gradient of the loss function
+        gradient = np.dot(X.T, (y_pred - y_true)) / y_true.size
+        
+        return gradient

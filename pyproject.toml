@@ -1,0 +1,23 @@
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry]
+name = "regression"
+version = "0.2.5"
+authors = ["Abolfazl Arab <abolfazl.arab@ucsf.edu>"]
+readme = "README.md"
+license = "MIT"
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pytest = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+scikit-learn = "*"
+
+[tool.poetry.urls]
+homepage = "https://github.com/abearab/HW7-Regression"
