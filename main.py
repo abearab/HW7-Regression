@@ -36,6 +36,7 @@ def main():
     # For testing purposes, once you've added your code.
     # CAUTION: hyperparameters have not been optimized.
     log_model = logreg.LogisticRegressor(num_feats=6, learning_rate=0.00001, tol=0.01, max_iter=10, batch_size=10)
+    log_model.hyperparameter_tuning(X_train, y_train, X_val, y_val) # just running the hyperparameter tuning method to see better hyperparameters :)
     log_model.train_model(X_train, y_train, X_val, y_val)
     log_model.plot_loss_history()
 

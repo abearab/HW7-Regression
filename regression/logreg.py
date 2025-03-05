@@ -183,3 +183,44 @@ class LogisticRegressor(BaseRegressor):
         gradient = np.dot(X.T, (y_pred - y_true)) / y_true.size
         
         return gradient
+
+    def hyperparameter_tuning(self, 
+                              X_train, y_train, X_val, y_val, 
+                              learning_rates=[10**-6, 10**-5, 10**-4, 10**-3, 10**-2, 10**-1],
+                              batch_sizes=[10, 50, 100],
+                              max_iters=[25, 50, 100, 250, 500, 1000]
+                              ):
+        """
+        An optional method for hyperparameter tuning. This is not required for the assignment,
+        but can be useful for finding the best hyperparameters for the model.
+        """
+        # Initialize best hyperparameters and best loss
+        best_lr = None
+        best_bs = None
+        best_loss = float('inf')
+
+        # Iterate over all combinations of hyperparameters
+        for lr in learning_rates:
+            for bs in batch_sizes:
+                # Reset model
+                self.reset_model()
+                # Train model with current hyperparameters
+                self.lr = lr
+                self.batch_size = bs
+                for mi in max_iters:
+                    self.max_iter = mi
+                    self.train_model(X_train, y_train, X_val, y_val)
+                    # Calculate validation loss
+                    val_loss = self.loss_function(y_val, self.make_prediction(X_val))
+                    # Update best hyperparameters if current loss is lower
+                    if val_loss < best_loss:
+                        best_loss = val_loss
+                        best_lr = lr
+                        best_bs = bs
+                        best_mi = mi
+
+        # Set the best hyperparameters
+        self.lr = best_lr
+        self.batch_size = best_bs
+        self.max_iter = best_mi
+        print(f"Best hyperparameters: learning rate = {best_lr}, batch size = {best_bs}, max iterations = {best_mi}")
